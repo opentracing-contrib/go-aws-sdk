@@ -7,13 +7,13 @@ The `otaws` package makes it easy to add OpenTracing support for AWS SDK in Go.
 ## Installation
 
 ```
-go get github.com/opentracing-contrib/go-aws
+go get github.com/opentracing-contrib/go-aws-sdk
 ```
 
 ## Documentation
 
 See the basic usage examples below and the [package documentation on
-godoc.org](https://godoc.org/github.com/opentracing-contrib/go-aws).
+godoc.org](https://godoc.org/github.com/opentracing-contrib/go-aws-sdk).
 
 ## Usage
 
