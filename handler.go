@@ -1,12 +1,13 @@
 package otaws
 
 import (
+	"net/http"
+
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
-	"net/http"
 )
 
 func AddOTHandlers(cl *client.Client, opts ...Option) {
@@ -23,7 +24,15 @@ func otHandler(c *config) func(*request.Request) {
 	tracer := c.tracer
 
 	return func(r *request.Request) {
-		sp := tracer.StartSpan(r.Operation.Name)
+		var sp opentracing.Span
+
+		ctx := r.Context()
+		if ctx == nil {
+			sp = tracer.StartSpan(r.Operation.Name)
+		} else {
+			sp, ctx = opentracing.StartSpanFromContext(ctx, r.Operation.Name)
+			r.SetContext(ctx)
+		}
 		ext.SpanKindRPCClient.Set(sp)
 		ext.Component.Set(sp, "go-aws")
 		ext.HTTPMethod.Set(sp, r.Operation.HTTPMethod)
