@@ -15,6 +15,37 @@ import (
 	"testing"
 )
 
+func TestNonGlobalTracer(t *testing.T) {
+	tracer := mocktracer.New()
+
+	client := mock.NewMockClient(&aws.Config{
+		Region: aws.String("us-west-2"),
+	})
+
+	AddOTHandlers(client, WithTracer(tracer))
+
+	req := client.NewRequest(&request.Operation{
+		Name:       "Test Operation",
+		HTTPMethod: "POST",
+	}, nil, nil)
+
+	err := req.Send()
+	if err != nil {
+		t.Fatal("Expected request to succeed but failed:", err)
+	}
+
+	spans := tracer.FinishedSpans()
+
+	if numSpans := len(spans); numSpans != 1 {
+		t.Fatalf("Expected 1 span but found %d spans", numSpans)
+	}
+
+	span := spans[0]
+	if span.OperationName != "Test Operation" {
+		t.Errorf("Expected span to have operation name 'Test Operation' but was '%s'", span.OperationName)
+	}
+}
+
 // Test requires running local instance of DynamoDB
 func TestAWS(t *testing.T) {
 	tracer := mocktracer.New()
@@ -106,36 +137,5 @@ func TestNilResponse(t *testing.T) {
 		t.Fatal("Expected span to have an 'error' tag of type bool")
 	} else if errTag != true {
 		t.Fatal("Expected span's 'error' tag to be true but was false")
-	}
-}
-
-func TestNonGlobalTracer(t *testing.T) {
-	tracer := mocktracer.New()
-
-	client := mock.NewMockClient(&aws.Config{
-		Region: aws.String("us-west-2"),
-	})
-
-	AddOTHandlers(client, WithTracer(tracer))
-
-	req := client.NewRequest(&request.Operation{
-		Name:       "Test Operation",
-		HTTPMethod: "POST",
-	}, nil, nil)
-
-	err := req.Send()
-	if err != nil {
-		t.Fatal("Expected request to succeed but failed:", err)
-	}
-
-	spans := tracer.FinishedSpans()
-
-	if numSpans := len(spans); numSpans != 1 {
-		t.Fatalf("Expected 1 span but found %d spans", numSpans)
-	}
-
-	span := spans[0]
-	if span.OperationName != "Test Operation" {
-		t.Errorf("Expected span to have operation name 'Test Operation' but was '%s'", span.OperationName)
 	}
 }
