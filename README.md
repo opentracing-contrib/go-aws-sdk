@@ -1,4 +1,6 @@
-[![Build Status][ci-img]][ci] [![Apache-2.0 license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status][ci-img]][ci]
+[![GoDoc]](http://godoc.org/github.com/opentracing-contrib/go-aws-sdk)
+[![Apache-2.0 license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # OpenTracing support for AWS SDK in Go
 
@@ -47,3 +49,4 @@ result, err := dbClient.ListTables(&dynamodb.ListTablesInput{})
 
 [ci-img]: https://travis-ci.org/opentracing-contrib/go-aws-sdk.svg?branch=master
 [ci]: https://travis-ci.org/opentracing-contrib/go-aws-sdk
+[GoDoc]: https://godoc.org/github.com/opentracing-contrib/go-aws-sdk?status.svg
