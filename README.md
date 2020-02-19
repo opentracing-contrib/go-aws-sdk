@@ -25,7 +25,29 @@ var tracer opentracing.Tracer = ...
 
 // Optionally set Tracer as global 
 opentracing.SetGlobalTracer(tracer)
+```
 
+Add traces for all clients using same session:
+```
+// Create AWS Session
+sess := session.NewSession(...)
+
+// Add OpenTracing handlers using global tracer
+AddOTHandlersToSession(sess)
+
+// Or specify tracer explicitly
+AddOTHandlersToSession(sess, WithTracer(tracer))
+
+// Create AWS service client e.g. DynamoDB client
+dbCient := dynamodb.New(sess)
+
+// Call AWS client
+result, err := dbClient.ListTables(&dynamodb.ListTablesInput{})
+
+```
+
+Add traces to specific client instance:
+```
 // Create AWS Session
 sess := session.NewSession(...)
 
@@ -33,10 +55,10 @@ sess := session.NewSession(...)
 dbCient := dynamodb.New(sess)
 
 // Add OpenTracing handlers using global tracer
-AddOTHandlers(dbClient.Client)
+AddOTHandlersToClient(dbClient.Client)
 
 // Or specify tracer explicitly
-AddOTHandlers(dbClient.Client, WithTracer(tracer))
+AddOTHandlersToClient(dbClient.Client, WithTracer(tracer))
 
 // Call AWS client
 result, err := dbClient.ListTables(&dynamodb.ListTablesInput{})
