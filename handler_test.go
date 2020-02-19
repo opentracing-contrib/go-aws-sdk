@@ -22,7 +22,7 @@ func TestNonGlobalTracer(t *testing.T) {
 		Region: aws.String("us-west-2"),
 	})
 
-	AddOTHandlersToClient(client, WithTracer(tracer))
+	AddOTHandlers(client, WithTracer(tracer))
 
 	req := client.NewRequest(&request.Operation{
 		Name:       "Test Operation",
@@ -55,7 +55,7 @@ func TestAWS(t *testing.T) {
 		Region: aws.String("us-west-2"),
 	})
 
-	AddOTHandlersToClient(client)
+	AddOTHandlers(client)
 
 	req := client.NewRequest(&request.Operation{
 		Name:       "Test Operation",
@@ -120,7 +120,7 @@ func TestNilResponse(t *testing.T) {
 
 	dbClient := dynamodb.New(sess)
 
-	AddOTHandlersToClient(dbClient.Client)
+	AddOTHandlers(dbClient.Client)
 
 	_, err = dbClient.ListTables(&dynamodb.ListTablesInput{})
 	if err == nil {
