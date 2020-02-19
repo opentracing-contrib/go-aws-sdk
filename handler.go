@@ -1,6 +1,7 @@
 package otaws
 
 import (
+	"github.com/aws/aws-sdk-go/aws/session"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws/client"
@@ -10,14 +11,32 @@ import (
 	"github.com/opentracing/opentracing-go/log"
 )
 
+// AddOTHandlers adds open tracing handlers to aws client
+//
+// Deprecated: use AddOTHandlersToClient instead
 func AddOTHandlers(cl *client.Client, opts ...Option) {
+	addOTHandlers(&cl.Handlers, opts...)
+}
+
+// AddOTHandlersToClient adds open tracing handlers to aws client
+func AddOTHandlersToClient(cl *client.Client, opts ...Option) {
+	addOTHandlers(&cl.Handlers, opts...)
+}
+
+// AddOTHandlersToSession adds open tracing handlers to aws session.
+// Open tracing handlers will be propagated to all clients using this session.
+func AddOTHandlersToSession(sess *session.Session, opts ...Option) {
+	addOTHandlers(&sess.Handlers, opts...)
+}
+
+func addOTHandlers(h *request.Handlers, opts ...Option) {
 	c := defaultConfig()
 	for _, opt := range opts {
 		opt(c)
 	}
 
 	handler := otHandler(c)
-	cl.Handlers.Build.PushFront(handler)
+	h.Build.PushFront(handler)
 }
 
 func otHandler(c *config) func(*request.Request) {
